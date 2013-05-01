@@ -153,7 +153,7 @@
 
 ;; --- usage example
 (ql:quickload :memoize)
-(load "shortestpath.fas")
+(load "shortestpath.lisp")
 (use-package :org.altervista.andrear.shortest-path)
 (setq g (test-graph)) ; returns graph g
 (shortest-path g 1 8) ; shortest path from node 1 to 8
