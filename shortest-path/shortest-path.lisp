@@ -1,5 +1,6 @@
 #|| 
-    Copyright (C) 2013 Andrea Rossetti (aka "The Software Bin").
+    Copyright (C) 2013 Andrea Rossetti (aka "The Software Bin")
+                         http://andrear.altervista.org
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -17,6 +18,7 @@
     If agpl-3.0.txt is missing, you can read it here:
 
         <http://www.gnu.org/licenses/agpl-3.0.txt>
+
 ||#
 
 (defpackage #:org.altervista.andrear.shortest-path
@@ -30,7 +32,45 @@
    #:path-to-list 
    #:test-graph
    #:printpath
-   #:progname))
+   #:progname)
+   (:documentation 
+    "The following package solves the shortest path problem
+    using a completely functional approach. The shortest
+    path is defined as a recursive function with the
+    following arguments:
+
+    - graph edges
+    - source node
+    - destination node
+    - list of nodes already visited by the algorithm
+ 
+   org.tfeb.hax.memoize package must be loaded before
+   shortest-path package. It is used to memoize the
+   intermediate results and provide some speedup for
+   bigger graphs.
+
+   This initial release only solves simplified problems
+   where the cost function returns constantly the
+   edge weight 1, but the solver can be easily extended
+   by changing the definition of function (cost edges i j).
+
+   Please note that this package has actually been made by
+   a LISP newbie who just wanted to train himself a bit,
+   and has NOT been tested thoroughly for correctness nor
+   performance.
+
+   --------------------------------------------------------
+
+   Usage example:
+
+   (ql:quickload :memoize) ; loading easily with quicklisp
+   (load \"shortestpath.lisp\")
+   (use-package :org.altervista.andrear.shortest-path)
+   (setq g (test-graph)) ; returns graph g
+   (shortest-path g 1 8) ; shortest path from node 1 to 8
+   ; answer is: (3 ((2 ((1 ((0 NIL) (1 3))) (3 7))) (7 8))) 
+   ; i.e. the path is (1 3)->(3 7)->(7 8)")
+)
 
 (in-package #:org.altervista.andrear.shortest-path)
 
@@ -151,12 +191,6 @@
 ; (shortest-path :max-depth 8))
 ;(setq CUSTOM:*TRACE-INDENT* " ")
 
-;; --- usage example
-(ql:quickload :memoize)
-(load "shortestpath.lisp")
-(use-package :org.altervista.andrear.shortest-path)
-(setq g (test-graph)) ; returns graph g
-(shortest-path g 1 8) ; shortest path from node 1 to 8
-; -- answer is: (3 ((2 ((1 ((0 NIL) (1 3))) (3 7))) (7 8))) i.e. the path is (1 3)->(3 7)->(7 8) 
+
 
 ||#

@@ -98,6 +98,23 @@ a source node
 \end_inset
 
 .
+ 
+\begin_inset Formula $\mathbb{S}$
+\end_inset
+
+ stands for 
+\begin_inset Quotes eld
+\end_inset
+
+list of already visited nodes
+\begin_inset Quotes erd
+\end_inset
+
+, the initial value should be 
+\begin_inset Formula $V$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
