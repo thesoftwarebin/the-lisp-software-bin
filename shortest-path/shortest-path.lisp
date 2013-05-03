@@ -28,7 +28,6 @@
   (:export 
    #:shortest-path 
    #:graph-to-string 
-   #:graph-to-png 
    #:path-to-list 
    #:test-graph
    #:printpath
@@ -73,8 +72,6 @@
 )
 
 (in-package #:org.altervista.andrear.shortest-path)
-
-(defvar progname "C:\\Users\\andrea\\Documents\\Programmi\\Graphviz\\bin\\dot.exe")
 
 (defun aggregate-lists (lst) 
    "Utility function to merge many lists into a single one."
@@ -159,11 +156,6 @@
 
 (defun graph-to-string (edges)
   (format nil "digraph g {~%~{~^ ~d~^~%~}~%}" (mapcar (lambda (i) (format nil "~A -> {~{~A~^ ~}}" (car i) (cadr i))) edges)))
-
-(defun graph-to-png (edges pngfilename)
-  (with-open-stream 
-   (s (EXT:RUN-PROGRAM progname :arguments '("-Tpng" "-Grankdir=LR" "-o" pngfilename) :input :stream :output :terminal :wait t)) 
-   (princ (graph-to-string edges) s)))
 
 (defun path-to-list (s) 
   "Convert a path returned by `shortest-path' to a (slightly more readable) string."
