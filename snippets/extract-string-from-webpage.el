@@ -16,3 +16,12 @@
       (set-buffer previous-buffer)
       (kill-buffer b)
       s)))
+
+#||
+Usage example:
+
+(tsb/extract-string-from-webpage
+ "http://www.ts.ismar.cnr.it/node/14" 
+ "Raffica massima</td>.*\n.*<b>\\([0-9\\.]*\\)"
+ 1)
+||#
