@@ -39,7 +39,7 @@
   (if 
       (and 
        (listp a)
-       (not (fboundp (car a)))
+       (not (and (symbolp (car a)) (fboundp (car a))))
        (null (assoc (car a) *operator-table*))
        (not (eq (car a) 'infix)))
       (cons 'infix `,a)
