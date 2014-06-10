@@ -19,7 +19,7 @@
 
 (defun ^ (a b) (expt a b))
 
-(defvar *operator-table* '((^ (0 :right)) (* (1 :left)) (+ (2 :left))))
+(defvar *operator-table* '((^ (0 :right)) (* (1 :left)) (+ (2 :left)) (- (2 :left))))
 
 (defun operator-priority (op)
   (or 
