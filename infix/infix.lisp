@@ -19,35 +19,42 @@
 
 (defun ^ (a b) (expt a b))
 
-(defvar *operator-table* '((^ (0 :right)) (* (1 :left)) (+ (2 :left)) (- (2 :left))))
+(deftype asstype () `(member right left nonassoc))
 
-(defun operator-priority (op)
-  (or 
-   (cadr (assoc op *operator-table*))
-   (list (length *operator-table*) :left)))
+(defstruct opprop (prio nil :type integer) (ass nil :type asstype))
 
-(defun left-operator-wins (op1 op2)
-  (let ((pr1 (operator-priority op1))  ; pr1: example for key '+ is (2 :left)
-        (pr2 (operator-priority op2))) ; pr2: example for key '^ is (0 :right)
+(defvar *operator-table*
+  '((^ . #S(opprop :prio 0 :ass right))
+    (* . #S(opprop :prio 1 :ass  left))
+    (/ . #S(opprop :prio 1 :ass  left))
+    (+ . #S(opprop :prio 2 :ass  left))
+    (- . #S(opprop :prio 2 :ass  left))))
+
+(defun find-opprop (op)
+  (cdr (assoc op *operator-table*)))
+
+
+(defun opprop-lessp (op1 op2)
+  (let* ((opp1 (find-opprop op1)) ; opp1: example for key '+ is (2 :left)
+	 (opp1p (opprop-prio opp1))
+         (opp2 (find-opprop op2)) ; opp2: example for key '^ is (0 :right)
+	 (opp2p (opprop-prio opp2)))
     (cond 
-     ((and (eq (car pr1) (car pr2))) (not (eq (cadr pr1) :right)))
-     ((< (car pr1) (car pr2))        t)
-     ((> (car pr1) (car pr2))        nil)
-     (t                              (progn (format nil "left-operator-wins: internal error 1 = can't determine who wins") t)))))
- 
-(defmacro pre (a)
-  (if 
-      (and 
-       (listp a)
-       (not (and (symbolp (car a)) (fboundp (car a))))
-       (null (assoc (car a) *operator-table*))
-       (not (eq (car a) 'infix)))
-      (cons 'infix `,a)
-    `,a))
+     ((= opp1p opp2p) (eq (opprop-ass opp1) :left))
+     ((< opp1p opp2p) t)
+     ((> opp1p opp2p) nil)
+     (t		      (error "Could not compare operators (~s . ~s) and (~s . ~s)" op1 opp1 op2 opp2)))))
 
 (defmacro infix (a &optional op1 b op2 &rest r)
   (cond 
-   ((null op1)                   `(pre ,a))                                  ; term is number or "(expression)"
-   ((null op2)                   `(,op1 (pre ,a) (pre ,b)))                  ; put operator at first pos
-   ((left-operator-wins op1 op2) `(infix (,op1 (pre ,a) (pre ,b)) ,op2 ,@r)) ; reduce terms on the left
-   (t                            `(infix ,a ,op1 (infix ,b ,op2 ,@r)))))     ; reduce terms on the right
+    ((null op1) (if (and 
+		     (listp a)
+		     (not (and (symbolp (car a)) (fboundp (car a))))
+		     (null (find-opprop (car a)))
+		     (not (eq (car a) 'infix)))
+		    `(infix ,@a) ; then "(expression)"
+		    `,a))        ; else number or non-infix expression 
+   ((null op2)             `(,op1 (infix ,a) (infix ,b)))		   ; put operator at first pos
+   ((opprop-lessp op1 op2) `(infix (,op1 (infix ,a) (infix ,b)) ,op2 ,@r)) ; reduce terms on the left
+   (t                      `(infix ,a ,op1 (infix ,b ,op2 ,@r)))))         ; reduce terms on the right
+
